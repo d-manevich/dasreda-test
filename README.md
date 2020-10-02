@@ -2,6 +2,15 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+[Demo](https://dasreda-test.vercel.app/)
+
+## Как работает
+Для Github GraphQL требуется `Personal access tokens`
+Что бы не тратить время на QAuth и не хардкодить свой токен, сделал что при первом запуске необходимо ввести свой  `Personal access tokens`, затем он сохранится в `localStorage`
+Создать свой `Personal access tokens` можно тут [Personal access tokens](https://github.com/settings/tokens)
+
+Не успел сделать селектор со всеми возможными `Licence`, так что пока это просто поле ввода (значения можно брать [отсюда](https://docs.github.com/en/free-pro-team@latest/github/creating-cloning-and-archiving-repositories/licensing-a-repository#searching-github-by-license-type))
+
 ## Available Scripts
 
 In the project directory, you can run:
