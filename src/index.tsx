@@ -11,8 +11,14 @@ const httpLink = createHttpLink({
 });
 
 const authLink = setContext((_, { headers }) => {
-  // get the authentication token prompt
-  const token = prompt('Please enter your github Personal access tokens');
+  // try to get token from localStorage
+  let token = localStorage.getItem('token');
+
+  if (!token) {
+    // get the authentication token from prompt
+    token = prompt('Please enter your github Personal access tokens') || '';
+    localStorage.setItem('token', token);
+  }
   // return the headers to the context so httpLink can read them
   return {
     headers: {
