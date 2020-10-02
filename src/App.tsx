@@ -21,8 +21,8 @@ type SearchResult = {
 };
 
 const GET_REPOITORIES = gql`
-  query GetRepositories {
-    search(query: "created:>2020-09-02 language:JavaScript sort:stars-desc", type: REPOSITORY, first: 10) {
+  query GetRepositories($query: String!) {
+    search(query: $query, type: REPOSITORY, first: 10) {
       repositoryCount
       nodes {
         ... on Repository {
@@ -40,8 +40,13 @@ const GET_REPOITORIES = gql`
   }
 `;
 
+const monthAgoDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+const monthAgoISOString = monthAgoDate.toISOString().split('T')[0]; // Hate native date
+
 const App: React.FC = () => {
-  const { loading, error, data } = useQuery<SearchResult>(GET_REPOITORIES);
+  const { loading, error, data } = useQuery<SearchResult>(GET_REPOITORIES, {
+    variables: { query: `created:>${monthAgoISOString} language:JavaScript sort:stars-desc` },
+  });
 
   if (loading) return <div className="App">Loading...</div>;
   if (error) return <div className="App">Error :(</div>;
