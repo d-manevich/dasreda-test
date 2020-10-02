@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import './App.css';
 import { useQuery, gql } from '@apollo/client';
+
+import Filter from './Filter';
 
 type Repository = {
   id: string;
@@ -20,9 +22,15 @@ type SearchResult = {
   };
 };
 
+type QueryParams = {
+  fromDate: string;
+  name?: string;
+  license?: string;
+};
+
 const GET_REPOITORIES = gql`
-  query GetRepositories($query: String!) {
-    search(query: $query, type: REPOSITORY, first: 10) {
+  query GetRepositories($query: String!, $count: Int = 10) {
+    search(query: $query, type: REPOSITORY, first: $count) {
       repositoryCount
       nodes {
         ... on Repository {
@@ -42,12 +50,28 @@ const GET_REPOITORIES = gql`
 
 // Right now exactly 30 days, change it if you need calendar month
 const monthAgoDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-const monthAgoISOString = monthAgoDate.toISOString().split('T')[0]; // Hate native Date
+const fromDate = monthAgoDate.toISOString().split('T')[0]; // Hate native Date
+
+function getQuery({ fromDate, name, license }: QueryParams): string {
+  let query = `created:>${fromDate} language:JavaScript sort:stars-desc`;
+
+  if (name) query += ` ${name} in:name`;
+  if (license) query += ` license:${license}`;
+
+  return query;
+}
 
 const App: React.FC = () => {
+  const [name, setName] = useState<string>('');
+  const [license, setLicense] = useState<string>('');
   const { loading, error, data } = useQuery<SearchResult>(GET_REPOITORIES, {
-    variables: { query: `created:>${monthAgoISOString} language:JavaScript sort:stars-desc` },
+    variables: { query: getQuery({ fromDate, name, license }), count: 100 },
   });
+
+  const handleSubmit = useCallback((name, license) => {
+    setName(name);
+    setLicense(license);
+  }, []);
 
   if (loading) return <div className="App">Loading...</div>;
   if (error) return <div className="App">Error :(</div>;
@@ -55,6 +79,7 @@ const App: React.FC = () => {
   return (
     <div className="App">
       <div className="Total">{data?.search.repositoryCount || 0} repository results</div>
+      <Filter name={name} license={license} onSubmit={handleSubmit} />
 
       {data?.search.nodes.map(({ id, nameWithOwner, url, description, stargazerCount, licenseInfo }) => (
         <div className="Repository" key={id}>
