@@ -40,8 +40,9 @@ const GET_REPOITORIES = gql`
   }
 `;
 
+// Right now exactly 30 days, change it if you need calendar month
 const monthAgoDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-const monthAgoISOString = monthAgoDate.toISOString().split('T')[0]; // Hate native date
+const monthAgoISOString = monthAgoDate.toISOString().split('T')[0]; // Hate native Date
 
 const App: React.FC = () => {
   const { loading, error, data } = useQuery<SearchResult>(GET_REPOITORIES, {
